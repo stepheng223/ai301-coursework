@@ -30,4 +30,4 @@ else in the rubric applies as written.
 
 ## Your fit profile
 
-I have worked mostly with Python and JavaScript/TypeScript, and I am comfortable reading small bug reports, tracing tests, and making focused code changes. I want to get better at identifying issues that are genuinely beginner-friendly, especially when the fix is isolated and the repo still feels active. I prefer tasks with clear reproduction steps, small code paths, and a low risk of scope creep or ambiguous product decisions.
+I am using this course's Python-based PathReview repo to build confidence in tracing test failures and making focused bug fixes. I want more practice working from a clear reproduction to a small, testable change. I prefer tasks with concise reproduction steps, a narrow code path, and little product ambiguity.
