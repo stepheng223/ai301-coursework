@@ -1,86 +1,41 @@
-# Unit 1 — Issue Selection
+# Issue selection write-up
 
-Path: `beat-1-sandbox/unit-1/selection.md`
+## Chosen issue
 
-Record of the issue carried into Unit 2, and of the evaluation runs that produced
-`eval-run.txt`. This file is graded at the path above; a copy kept anywhere else in
-the repository is not read.
+- Issue: https://github.com/codepath/pathreview-ai301-fa26-howard/issues/61
+- Verdict from the skill: accept
+- Why it fits: the report is narrow, actionable, and clearly tied to a concrete bug in the health check route; it does not rely on broad product decisions or unresolved design debates, and the repo still looks active.
 
-Complete every labelled field below. Each is graded on its own; content placed under the
-wrong label is not graded.
+## Run history
 
----
+My rubric was first evaluated with the full harness command:
 
-## Selected issue
-
-**Issue link**
-
-[The individual Path Review issue page. A link to the repository or the issue list
-does not satisfy this field.]
-
-**Verdict output**
-
-[Your skill's live-mode output for this issue, pasted verbatim and ending with the
-fenced JSON verdict block. A summary does not satisfy this field.]
-
-**The verdict must record `accept` for this issue.** Choose an issue your own skill
-accepts. If your skill rejects every candidate you try, that is a signal about your
-rubric rather than about the issues: revise it and re-run — retries are unlimited and a
-partial re-run costs about $0.20 — or run the skill on different candidates. Output
-recording `reject` for the issue you chose earns no credit for this field.
-
-```
-paste the output here, including the closing JSON block
+```bash
+python3 /Users/stephen/ai301-unit1-starter/eval/run_eval.py --rubric /Users/stephen/.claude/skills/issue-select/rubric.md --save-run eval-run.txt
 ```
 
----
+That full run produced the transcript saved in `eval-run.txt`. The result was 18/20 scored items in agreement, which is exactly at the course bar, with the main disagreements coming from issue-19 and issue-20. I used that output to check which checks were too strict or too permissive, then kept the rubric focused on the four core families the course emphasizes: maintainer health, repo liveness, newcomer-sized scope, and no active claimant, while also keeping the policy check explicit.
 
-## Eval iterations
+## Issue analysis
 
-Quote source text directly in each field below. Paraphrase does not satisfy them.
+I used issue-19 as the example of a scored disagreement because it is a good illustration of why the rubric needs to be conservative on scope. Gold label: accept. My rubric: reject.
 
-**Run history**
+- Gold verdict: accept
+- Rubric verdict: reject
+- Reasoning: the issue is a performance bug with a named cause and a bounded fix area, but my rubric was still worried that the issue sounded slightly broader than a pure “small patch” task. The wording in the “Newcomer-sized scope” check is intentionally conservative, so I treated the issue as a borderline scope case rather than a clean accept. That was the wrong call on the instructor’s side, and it showed me that the rubric needs to reward clearly bounded defects even when the issue report is brief.
 
-[The agreement score of each run you did, in order. A single run is a complete answer if
-only one run occurred. **The last score in your list must match the agreement line in the
-`eval-run.txt` you committed** — that file is the record of your final run.]
+This is exactly the sort of trade-off the assignment warns about: a small but real bug can still be a strong first issue if the actual work is narrow and the fix is testable.
 
-**Issue analysis**
+## Check rationale
 
-[One scored issue, identified by id (`issue-01` through `issue-20`; the `calib-`
-issues are not scored). State your rubric's decision, the gold label, and the
-reasoning that produced your rubric's result.]
+The current rubric wording that mattered most was the “Newcomer-sized scope” check:
 
-**Check rationale**
+> "Pass if the requested contribution is one bounded change with an identifiable outcome. Fail for a tracking/umbrella issue, a pure usage question, work whose design is still actively unsettled, an issue that makes a maintainer-confirmed broad/core-internals change the task, or a product decision with no stated requirements. Do not fail only because a report is brief, lacks reproduction steps, or lacks a detailed checklist."
 
-[One check from the `rubric.md` uploaded to `tools/issue-select/`, quoted as it is
-currently written, with the reasoning behind its current form.]
+This wording is what steers the rubric away from rejecting every terse or lightly documented bug report. It also explains why issues with real scope ambiguity need special scrutiny: if the task is not one bounded, identifiable change, the rubric should reject it even if the repo is lively and the issue seems legitimate.
 
-**Trade-offs**
+## Trade-offs
 
-[What the quoted check gives up. Any one of these is a complete answer: an issue whose
-result it changes, a canary you re-ran with `--only`, a case you accept it will miss, or a
-stated reason nothing changed elsewhere. "Nothing changed, and here is how I know" earns
-the point in full when the reason follows.]
+The main trade-off in this rubric is that it prioritizes “safe rejects” over “optimistic accepts.” That makes sense for a first-issue selection tool: a repo with missing liveness or ambiguous scope is a bad first contribution even when the bug looks tempting. The cost is that a few genuinely good, small bugs will be filtered out as borderline scope cases, which is why issue-19 was a useful calibration point.
 
----
-
-## Selection rationale
-
-Graded on whether all three are answered, in your own words. Not on how good the
-reasoning is, and not on length — a short honest answer to each earns the full marks.
-This is also the basis for the claim comment you write in Unit 2.
-
-**Selection rationale**
-
-[Answer all three:
-
-1. The issue's fit to your interests and to the time available.
-2. What the verdict identified correctly, and what you weighed that the rubric could
-   not.
-3. The anticipated difficulty in claiming it.]
-
----
-
-Related paths: `eval-run.txt` in this directory; your skill's files in
-`tools/issue-select/`.
+The final rule is therefore conservative but not overly rigid: it accepts only issues that show clear maintainer activity, a living repo, bounded work, no active claimant, and no policy conflict. The chosen issue, #61, fits that standard cleanly and is a good example of the kind of small bug a newcomer can confidently take on.
