@@ -55,10 +55,23 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 9: Installed the issue-scout over my Unit 5 skill, wrote my search strategy, and ran one scan plus five direct grades.**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I replaced issue-select with issue-scout, carried my fit profile forward
+(Python, small libraries and dev tools, bug reports with concrete
+reproductions), and wrote three `gh search issues` queries that each
+trace to a sentence of that profile, plus five ranking filters including
+a fewest-comments-first ordering. The scan surfaced 294 candidates, 245
+after filters, and graded the top 5 (2 accept, 3 reject on scope or
+active-claimant). What fell short wasn't the scout — it was the picks:
+I claimed five issues from the Issue Selection site this week and the
+scout rejected every one of them, most on "No active claimant" (open PRs
+already linked, including one issue with four competing PRs). I didn't
+patch the rubric or the strategy; the scout caught real competition
+exactly as it is supposed to. I did add a line to scan-notes.md flagging
+that "fewest comments first" pulls brand-new issues to the top because
+they trivially have zero comments, which I'll revisit if a future scan
+is dominated by same-day issues.
 
 **Unit 6: [one line on the tool work]**
 
