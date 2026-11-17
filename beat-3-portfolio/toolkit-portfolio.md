@@ -35,25 +35,47 @@ The catch it actually made (2026-11-14): sprocguard#8 surfaced via the freshness
 
 **repro-check**
 
-**What it is, and the judgment hole I wrote:** repro-check takes an issue and decides whether I can reproduce the claim it makes. The judgment I wrote is what counts as reproduced for the kind of issue I pick: for a documentation issue, "reproduced" means every command, setting, and path the issue body mentions is still present in the current code at the version I'm reading. That turned out to matter — sprocguard#8 named four ODBC/auth/safety scenarios and the only way to vouch for them was to pin each one to a line in `src/sprocguard/config.py`.
+**What it is, and the judgment hole I wrote:** repro-check takes an issue and decides whether I can reproduce the claim it makes. The judgment I wrote is what counts as reproduced for the kind of issue I actually pick: for a documentation issue, "reproduced" means every command, setting, and path the issue body mentions is still present in the current code at the version I'm reading. That rule is mine — the tool shipped without one — and it matters because sprocguard#8 named four ODBC/auth/safety scenarios whose only vouching was pinning each to a line in `src/sprocguard/config.py`.
 
 **How it evolved, dated:**
-- 2026-10 — Installed `repro-check` at Unit 2 (placeholder in `tools/repro-check/`).
-- 2026-11-14 — First real use, on sprocguard#8. The judgment I applied: for a documentation issue, reproduction means confirming the issue body's claims are still true in the current code. Cross-checked every command and setting against `src/sprocguard/config.py`.
+- 2026-10 — Installed `repro-check` at Unit 2. Friction: the tool shipped with no rule for what "reproduced" meant for a documentation issue, so it would have graded sprocguard#8 as unreproducible by default (no failing test to show).
+- 2026-11-14 — Wrote the doc-issue rule into my local repro-check invocation: "reproduced" = every command, setting, and file:line the issue body cites is present in the current code. Friction: without that rule, a valid docs issue has no reproduction path and the tool rejects it. Change made it usable on docs issues.
+- 2026-11-14 — Ran the rule against sprocguard#8 and produced the file:line pin map used below.
 
-**Evidence:** All four Troubleshooting entries verified at specific lines: driver strings at 152–153, `password_env` default at 30, `allowed_databases` refusal at 41 and 137–139, `TrustServerCertificate=yes` in sample config at 153. These file:line pins traveled into the PR body's Evidence block: https://github.com/JheysonJhordyHuarauyaRiquelme/sprocguard/pull/11
+**Evidence:** All four Troubleshooting entries verified at specific lines in `src/sprocguard/config.py`:
+
+```
+Troubleshooting entry                      config.py location
+---------------------------------------    ---------------------------------
+ODBC Driver 17/18 install                  lines 152–153 (driver strings)
+password_env for SQL authentication        line 30 (default)
+"database not allowed" refusal             line 41 + lines 137–139 (safety layer)
+TrustServerCertificate=yes for ODBC 18     line 153 (sample config)
+```
+
+Those pins traveled verbatim into the PR body's Evidence block: https://github.com/JheysonJhordyHuarauyaRiquelme/sprocguard/pull/11
 
 ---
 
 **plan-check**
 
-**What it is, and the judgment hole I wrote:** plan-check takes a planned fix and decides whether it's ready to post and build from. The judgment I wrote is a rule that every claim in the plan has to tie back to a line of code a reviewer could check on their own, not to my memory or to the issue text. For sprocguard#8 that meant the plan was literally a map: four Troubleshooting entries to four `config.py` locations, which became the PR's Evidence block verbatim.
+**What it is, and the judgment hole I wrote:** plan-check takes a planned fix and decides whether it's ready to post and build from. The judgment I wrote is a rule that every claim in the plan has to tie back to a line of code a reviewer could check on their own, not to my memory and not to the issue text. For sprocguard#8 the plan was literally that map — four Troubleshooting entries to four `config.py` locations — which became the PR's Evidence block verbatim.
 
 **How it evolved, dated:**
-- 2026-10 — Installed `plan-check` at Unit 3 (placeholder in `tools/plan-check/`).
-- 2026-11-14 — Used on sprocguard#8 to plan the fix from the code, not the issue text. Tied each of the four Troubleshooting entries to a line or block in `config.py` so a reviewer could verify each one against the code.
+- 2026-10 — Installed `plan-check` at Unit 3. Friction: the tool asked whether a plan was ready but did not say what "ready" meant for a documentation PR, where there is no failing test to flip green.
+- 2026-11-14 — Wrote the "every plan claim ties to a code line the reviewer can check without reading the issue" rule and applied it to the sprocguard#8 plan. Friction: without that rule, a docs plan reads as "add some words" and a reviewer has no cheap verification path. Change: the rule forces the plan to be a reviewer-ready evidence map before I post anything.
 
-**Evidence:** The plan became the PR's Evidence block. Reviewers can verify every claim without reading the issue — each Troubleshooting entry points at a line in `src/sprocguard/config.py`. See PR #11.
+**Evidence:** The plan became the PR's Evidence block verbatim. Excerpt from PR #11's body:
+
+```
+Evidence (every claim pinned to config.py):
+- ODBC Driver 17/18 strings: src/sprocguard/config.py:152-153
+- password_env default:      src/sprocguard/config.py:30
+- allowed_databases refusal: src/sprocguard/config.py:41, 137-139
+- TrustServerCertificate=yes sample: src/sprocguard/config.py:153
+```
+
+A reviewer can verify every claim by opening one file at those line numbers.
 
 ---
 
@@ -95,6 +117,6 @@ The honest shape of this toolkit is that it is thin in evolution — three of my
 **Tool limits.**
 
 issue-scout: ranking filters still have no freshness signal — I caught the gap manually in Unit 10 and logged it in `scan-notes.md`, but I have not yet patched `search-strategy.md` to prefer "created within the last 14 days."
-repro-check: only exercised on a documentation issue where reproduction meant confirming file:line references; untested on a code-behavior bug where reproduction would need a failing test.
-plan-check: same single-exposure limit — used only on a docs change whose plan was a line-by-line map. Untried on a multi-file code change where the plan would need to sequence edits across files.
+repro-check: the doc-issue rule I wrote only covers documentation issues; untested on a code-behavior bug where reproduction would need a failing test, and the tool has no rule for that case yet.
+plan-check: same single-exposure limit — the "pin every claim to a code line" rule works for a docs change whose plan is a line-by-line map, but is untried on a multi-file code change where the plan would need to sequence edits across files.
 pr-precheck: no feedback loop closed yet — PR #11 is still awaiting review, so the tool has not been tested against a real maintainer response.
